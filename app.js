@@ -2,37 +2,28 @@ const express = require("express");
 const bodyParser = require("body-parser");
 
 const app = express();
+app.use(bodyParser.urlencoded({ extended: false }));
 app.set("view engine", "ejs");
+app.use(express.static("Public"));
 
+let items = ["Exercise", "Ready", "Breakfast", "Mail"];
 app.get("/", function (req, res) {
-  const date = new Date();
-  let numericDay = date.getDay();
-  let day = "";
+  const today = new Date();
+  const options = {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
+  let currentDay = today.toLocaleDateString("en-US", options);
 
-  switch (numericDay) {
-    case 0:
-      day = "Sunday";
-      break;
-    case 1:
-      day = "Monday";
-      break;
-    case 2:
-      day = "Tuesday";
-      break;
-    case 3:
-      day = "Wednesday";
-      break;
-    case 4:
-      day = "Thursday";
-      break;
-    case 5:
-      day = "Friday";
-      break;
-    case 6:
-      day = "Saturday";
-    default:
-  }
-  res.render("day", { kindDay: day });
+  res.render("day", { kindDay: currentDay, newListItems: items });
+});
+
+app.post("/", function (req, res) {
+  var item = req.body.newitem;
+  items.push(item);
+  res.redirect("/");
 });
 
 app.listen(3000, function () {
